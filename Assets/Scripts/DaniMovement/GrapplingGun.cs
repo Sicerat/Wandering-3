@@ -9,6 +9,7 @@ public class GrapplingGun : MonoBehaviour {
     public LayerMask whatIsGrappleable;
     public Transform gunTip, camera, player;
     public float defaultPullSpeed, stretchSpeed;
+    public float pullAcceleration = 0.01f;
     private float currentPullSpeed;
     private float maxDistance = 100f;
     private SpringJoint joint;
@@ -234,12 +235,13 @@ public class GrapplingGun : MonoBehaviour {
 
             joint = player.gameObject.AddComponent<SpringJoint>();
             joint.autoConfigureConnectedAnchor = false;
+
             if (hit.transform.gameObject.GetComponent<Grappable>() != null)
             {
                 joint.connectedBody = hit.rigidbody;
                 joint.connectedMassScale = 100;
                 grappleAnchor = hit.transform.gameObject.GetComponent<Grappable>().CreateJointAnchor(hit);
-                grapplePoint = grappleAnchor.transform.position;
+                grapplePoint = grappleAnchor.transform.localPosition;
             }
             else
             {
@@ -259,6 +261,10 @@ public class GrapplingGun : MonoBehaviour {
             print("Previous pull speed: " + currentPullSpeed);
             currentPullSpeed = joint.maxDistance * 0.01f * defaultPullSpeed;
             print("Set pulling parameters to default: " + currentPullSpeed);
+            print("Start max distance: " + joint.maxDistance);
+            print("Start min distance: " + joint.minDistance);
+            print("Start connected mass scale: " + joint.connectedMassScale);
+
 
             //Adjust these values to fit your game.
             joint.spring = jointSpring;
@@ -286,12 +292,10 @@ public class GrapplingGun : MonoBehaviour {
     void PullOnGrapple()
     {
         if (joint == null) return;
-        //print("Joint exists!");
-        currentPullSpeed += 0.01f;
-        //print("Default pull speed: " + defaultPullSpeed);
-        //print("Current pull speed: " + currentPullSpeed);
+
+        currentPullSpeed += pullAcceleration;
+
         joint.maxDistance -= currentPullSpeed * Time.fixedDeltaTime;
-        //joint.maxDistance = Mathf.Lerp(joint.maxDistance, desiredLenght, 0.5f);
         print("Current joint max distance: " + joint.maxDistance);
     }
 
@@ -308,7 +312,26 @@ public class GrapplingGun : MonoBehaviour {
 
         if(grappleAnchor != null)
         {
-            currentGrapplePosition = Vector3.Lerp(currentGrapplePosition, grappleAnchor.transform.position, Time.deltaTime * 8f);
+            if ( (currentGrapplePosition-grappleAnchor.transform.position).magnitude < 1)
+            {
+                //currentGrapplePosition = Vector3.Lerp(currentGrapplePosition, grappleAnchor.transform.position, Time.deltaTime * 8f);
+                currentGrapplePosition = grappleAnchor.transform.position;
+            }
+            else
+            {
+                //float u = Vector3.Angle(grappleAnchor.transform.position - currentGrapplePosition, grappleAnchor.transform.position - gunTip.position);
+                //float hyp1 = (grappleAnchor.transform.position - currentGrapplePosition).magnitude * Mathf.Sin(u * Mathf.Deg2Rad);
+
+                //float yComp = hyp1 * Mathf.Cos(u * Mathf.Deg2Rad);
+                //float xComp = hyp1 * Mathf.Sin(u * Mathf.Deg2Rad);
+
+                
+
+                //Vector3 movementCorrection = new Vector3(yComp, 0, xComp);
+                currentGrapplePosition = currentGrapplePosition + (grappleAnchor.transform.position - currentGrapplePosition).normalized * 0.8f;
+                //+ (grappleAnchor.transform.position - currentGrapplePosition).normalized * 0.1f
+            }
+
         }
         else
         {

@@ -21,33 +21,28 @@ public class RecoilGun : MonoBehaviour
 
         if (inRecoil & grappling.Mode != 2)
         {
-            //print(transform.localRotation.eulerAngles.x + " " + recoilRot.eulerAngles.x);
 
-            if( transform.localRotation.eulerAngles.x - 10f <= recoilRot.eulerAngles.x & !goingBack & transform.localRotation.eulerAngles.x > 180f)
+            if( grappling.transform.localRotation.eulerAngles.x - 10f <= recoilRot.eulerAngles.x & !goingBack & grappling.transform.localRotation.eulerAngles.x > 180f)
             {
-                //print(1);
                 goingBack = true;
             }
 
             if(!goingBack)
             {
-                print(2);
                 desiredRot = recoilRot;
-                //print("Desired Rot: " + desiredRot.eulerAngles);
             }
             else
             {
-                print(3);
                 desiredRot = defaultRot;
             }
 
-            print("default Rot: " + defaultRot.eulerAngles + " | current Rot: " + transform.localRotation.eulerAngles + " | desired Rot: " + desiredRot.eulerAngles);
-            transform.localRotation = Quaternion.Slerp(transform.localRotation, desiredRot, Time.deltaTime * rotationSpeed);
+            //print("default Rot: " + defaultRot.eulerAngles + " | current Rot: " + transform.localRotation.eulerAngles + " | desired Rot: " + desiredRot.eulerAngles);
+            grappling.transform.localRotation = Quaternion.Slerp(grappling.transform.localRotation, desiredRot, Time.deltaTime * rotationSpeed);
         }
 
         
 
-        if(goingBack && transform.localRotation == defaultRot)
+        if(goingBack && grappling.transform.localRotation == defaultRot)
         {
             inRecoil = false;
             goingBack = false;
@@ -58,6 +53,6 @@ public class RecoilGun : MonoBehaviour
     {
         goingBack = false;
         inRecoil = true;
-        recoilRot = Quaternion.Euler(transform.localRotation.eulerAngles + new Vector3(-recoilAngle, 0));
+        recoilRot = Quaternion.Euler(grappling.transform.localRotation.eulerAngles + new Vector3(-recoilAngle, 0));
     }
 }
