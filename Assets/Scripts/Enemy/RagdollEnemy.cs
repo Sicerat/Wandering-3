@@ -8,6 +8,9 @@ public class RagdollEnemy : MonoBehaviour
     public float health = 100f;
     public float killVelocity;
     public LayerMask whatCanHitMe;
+    public float deathHitForce = 10000f;
+    public float hitOverlapSphereRadius = 1f;
+    public LayerMask hitOverlapSphereMask;
 
     Rigidbody rb;
     // Start is called before the first frame update
@@ -35,13 +38,14 @@ public class RagdollEnemy : MonoBehaviour
             if(collision.gameObject.GetComponent<Rigidbody>().velocity.magnitude >= killVelocity)
             {
                 Die();
-
-                print("My velocity after death: " + this.GetComponent<Rigidbody>().velocity);
-                foreach (Collider c in RagdollParts)
+                Collider[] hitColliders = Physics.OverlapSphere(collision.GetContact(0).point, hitOverlapSphereRadius, hitOverlapSphereMask);
+                foreach (Collider c in hitColliders)
                 {
-                    print(c.attachedRigidbody.velocity);
+                    if (c.attachedRigidbody != null)
+                    {
+                        c.attachedRigidbody.AddForce(new Vector3(collision.gameObject.GetComponent<Rigidbody>().velocity.x, 0, collision.gameObject.GetComponent<Rigidbody>().velocity.z).normalized * deathHitForce / hitColliders.Length);
+                    }
                 }
-                //GetComponent<Rigidbody>().AddForce(new Vector3(collision.gameObject.GetComponent<Rigidbody>().velocity.x, 0, collision.gameObject.GetComponent<Rigidbody>().velocity.z));
             }
         }
     }
@@ -55,6 +59,7 @@ public class RagdollEnemy : MonoBehaviour
             if (c.gameObject != this.gameObject)
             {
                 c.isTrigger = true;
+                c.attachedRigidbody.isKinematic = true;
                 RagdollParts.Add(c);
             }
         }
@@ -69,6 +74,7 @@ public class RagdollEnemy : MonoBehaviour
         foreach(Collider c in RagdollParts)
         {
             c.isTrigger = false;
+            c.attachedRigidbody.isKinematic = false;
             c.attachedRigidbody.velocity = Vector3.zero;
         }
     }
@@ -82,15 +88,17 @@ public class RagdollEnemy : MonoBehaviour
         foreach (Collider c in RagdollParts)
         {
             c.isTrigger = true;
+            c.attachedRigidbody.isKinematic = true;
         }
     }
 
-    public void ReceiveDamage(float damage)
+    public void ReceiveDamage(float damage, GameObject partOfBody, Vector3 hitDirection)
     {
         health -= damage;
         if(health <= 0)
         {
             Die();
+            partOfBody.GetComponent<Rigidbody>().AddForce(hitDirection.normalized * deathHitForce);
         }
     }
 

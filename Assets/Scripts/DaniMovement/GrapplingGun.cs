@@ -8,9 +8,10 @@ public class GrapplingGun : MonoBehaviour {
     private GameObject grappleAnchor;
     public LayerMask whatIsGrappleable;
     public Transform gunTip, camera, player;
-    public float defaultPullSpeed, stretchSpeed;
+    public float defaultPullSpeed, defaultStretchSpeed;
     public float pullAcceleration = 0.01f;
-    private float currentPullSpeed;
+    public float stretchAcceleration = 0.01f;
+    private float currentPullSpeed, currentStretchSpeed;
     private float maxDistance = 100f;
     private SpringJoint joint;
     public float jointSpring = 4.5f, jointDamper = 7f, jointMassScale = 4.5f;
@@ -67,7 +68,18 @@ public class GrapplingGun : MonoBehaviour {
             print("RMB released!");
         }
 
-        if(Input.GetAxis("Mouse ScrollWheel") != 0)
+        if (Input.GetMouseButton(2))
+        {
+            ChooseActionMMB();
+            print("RMB pressed!");
+        }
+        else if (Input.GetMouseButtonUp(2))
+        {
+            ChooseActionMMBUp();
+            print("RMB released!");
+        }
+
+        if (Input.GetAxis("Mouse ScrollWheel") != 0)
         {
             SwitchMode(Input.GetAxis("Mouse ScrollWheel"));
         }
@@ -134,7 +146,35 @@ public class GrapplingGun : MonoBehaviour {
                 Shoot();
                 break;
             case 2:
-                if(joint != null) StretchGrapple();
+                if (joint != null) currentPullSpeed = defaultPullSpeed;
+                break;
+        }
+    }
+
+    void ChooseActionMMB()
+    {
+        switch (mode)
+        {
+            case 0:
+                return;
+            case 1:
+                return;
+            case 2:
+                StretchGrapple();
+                break;
+        }
+    }
+
+    void ChooseActionMMBUp()
+    {
+        switch (mode)
+        {
+            case 0:
+                return;
+            case 1:
+                return;
+            case 2:
+                if (joint != null) currentStretchSpeed = defaultStretchSpeed;
                 break;
         }
     }
@@ -199,7 +239,7 @@ public class GrapplingGun : MonoBehaviour {
                 {
                     enemy = hit.transform.GetComponentInParent<RagdollEnemy>();
                 }
-                enemy.ReceiveDamage(gunDamage);
+                enemy.ReceiveDamage(gunDamage, hit.transform.gameObject, shootDir);
             }
             else if (hit.rigidbody != null)
             {
@@ -301,7 +341,11 @@ public class GrapplingGun : MonoBehaviour {
 
     void StretchGrapple()
     {
-        currentPullSpeed = joint.maxDistance * 0.01f * defaultPullSpeed;
+        if (joint == null) return;
+
+        currentStretchSpeed += stretchAcceleration;
+
+        joint.maxDistance += currentPullSpeed * Time.fixedDeltaTime;
     }
 
     private Vector3 currentGrapplePosition;
