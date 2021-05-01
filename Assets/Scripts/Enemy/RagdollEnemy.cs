@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class RagdollEnemy : MonoBehaviour
 {
@@ -104,6 +105,10 @@ public class RagdollEnemy : MonoBehaviour
 
     private void Die()
     {
+        NavMeshAgent agent = GetComponent<NavMeshAgent>();
+        EnemyController controller = GetComponent<EnemyController>();
+        controller.enabled = false;
+        agent.enabled = false;
         TurnOnRagdoll();
     }
 }
