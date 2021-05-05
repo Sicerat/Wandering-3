@@ -806,7 +806,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh17734
+  m_Name: pb_Mesh-2414
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -2153,6 +2153,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 971342115}
+  - {fileID: 1397650597}
   m_Father: {fileID: 207561484}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -13235,6 +13236,49 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   grappling: {fileID: 0}
   rotationSpeed: 30
+--- !u!1 &1397650596
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1397650597}
+  - component: {fileID: 1397650598}
+  m_Layer: 0
+  m_Name: GunEffectsHolder
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1397650597
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1397650596}
+  m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: 0.38359404, y: -0.20247573, z: 1.7170334}
+  m_LocalScale: {x: 0.18903999, y: 0.48299, z: 0.17236999}
+  m_Children: []
+  m_Father: {fileID: 170962263}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+--- !u!114 &1397650598
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1397650596}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cce2d1a8d33e0c446babfd1dc3dc8a5b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1408348827 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7795717204392240041, guid: a00f35947c22cf14b9b13e919028102c, type: 3}
@@ -20131,6 +20175,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weapon: {fileID: 0}
+  nextTimeToFire: 0
 --- !u!114 &2058150879
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20150,6 +20195,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1792
   hitDamage: 20
+  fireRate: 15
+  isAutomatic: 1
   spreading: 0.01
   impactForce: 30
   currentMode: 1
@@ -20157,6 +20204,8 @@ MonoBehaviour:
   instantiatedAltFireController: {fileID: 0}
   altFire: {fileID: 695617688834959747, guid: f977094c48e915f42aff3d2a9e8bb0ed, type: 3}
   gunTip: {fileID: 0}
+  gunEffectsHolder: {fileID: 0}
+  gunInterface: {fileID: 0}
   tracerEffect: {fileID: 1403394125792329964, guid: f112f9020baa965488ea4dd00ab6ff37, type: 3}
   instantiatedTracer: {fileID: 0}
   muzzleFlash: {fileID: 4276626836703735432, guid: 919f2c24343adcc478c18e28bc08f259, type: 3}

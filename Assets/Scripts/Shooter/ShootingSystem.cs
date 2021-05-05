@@ -10,6 +10,7 @@ public class ShootingSystem : MonoBehaviour
 
     Vector3 shootDir;
     RecoilGun gunRecoil;
+    public float nextTimeToFire = 0f;
 
 
     void Start()
@@ -28,14 +29,15 @@ public class ShootingSystem : MonoBehaviour
     public void Shoot(Vector3 raycastStart, Vector3 shootDirection)
     {
         RaycastHit hit;
+        nextTimeToFire = Time.time + 1f / weapon.fireRate;
 
         //Actual spreading randomization
         float dispersionX = Random.Range(-weapon.spreading, +weapon.spreading);
         float dispersionY = Random.Range(-weapon.spreading, +weapon.spreading);
         shootDir = shootDirection + new Vector3(dispersionX, dispersionY, 0);
 
-        weapon.tracerEffect.Emit(1);
-        weapon.muzzleFlash.Play();
+        weapon.instantiatedTracer.Emit(1);
+        weapon.instantiatedMuzzleFlash.Play();
         if (gunRecoil != null) gunRecoil.DoRecoil(weapon.recoilAngle);
 
         if (Physics.Raycast(raycastStart, shootDir, out hit, Mathf.Infinity, weapon.hittableLayers))
@@ -86,27 +88,27 @@ public class ShootingSystem : MonoBehaviour
         {
             if (direction > 0)
             {
-                if (weapon.currentMode == 2)
+                if (weapon.Mode == 2)
                 {
-                    weapon.currentMode = 0;
+                    weapon.Mode = 0;
                     return;
                 }
                 else
                 {
-                    weapon.currentMode++;
+                    weapon.Mode++;
                     return;
                 }
             }
             else
             {
-                if (weapon.currentMode == 0)
+                if (weapon.Mode == 0)
                 {
-                    weapon.currentMode = 2;
+                    weapon.Mode = 2;
                     return;
                 }
                 else
                 {
-                    weapon.currentMode--;
+                    weapon.Mode--;
                     return;
                 }
             }

@@ -26,6 +26,11 @@ public class PlayerInput : MonoBehaviour
             DoActionsLMBUp();
         }
 
+        if (Input.GetMouseButton(0))
+        {
+            DoActionsLMB();
+        }
+
         if (Input.GetMouseButton(1))
         {
             DoActionsRMB();
@@ -57,8 +62,13 @@ public class PlayerInput : MonoBehaviour
 
     public void DoActionsLMBDown()
     {
-        if (shootingSystem.weapon.currentMode == 1) shootingSystem.Shoot(camera.transform.position, camera.forward);
+        if (shootingSystem.weapon.currentMode == 1 && Time.time >= shootingSystem.nextTimeToFire) shootingSystem.Shoot(camera.transform.position, camera.forward);
         else shootingSystem.weapon.altFire.DoActionsLMBDown();
+    }
+
+    public void DoActionsLMB()
+    {
+        if (shootingSystem.weapon.currentMode == 1 && Time.time >= shootingSystem.nextTimeToFire && shootingSystem.weapon.isAutomatic) shootingSystem.Shoot(camera.transform.position, camera.forward);
     }
 
     public void DoActionsLMBUp()

@@ -10,6 +10,8 @@ public class WeaponTemplate : MonoBehaviour
     public LayerMask hittableLayers;
 
     public float hitDamage = 20f;
+    public float fireRate = 15f;
+    public bool isAutomatic = false;
     public float spreading = 0.01f;
     public float impactForce = 30f;
 
@@ -18,6 +20,8 @@ public class WeaponTemplate : MonoBehaviour
     public GameObject instantiatedAltFireController;
     public altFireBase altFire;
     public Transform gunTip;
+    public Transform gunEffectsHolder;
+    public GunInterface gunInterface;
 
     public ParticleSystem tracerEffect;
     public ParticleSystem instantiatedTracer;
@@ -32,8 +36,11 @@ public class WeaponTemplate : MonoBehaviour
     {
         instantiatedWeapon = Instantiate(weaponObj, weaponPos);
         gunTip = instantiatedWeapon.GetComponentInChildren<GunTip>().gameObject.transform;
-        instantiatedTracer = Instantiate(tracerEffect, gunTip);
-        instantiatedMuzzleFlash = Instantiate(muzzleFlash, gunTip);
+        gunEffectsHolder = GetComponentInChildren<GunEffectsHolder>().gameObject.transform;
+        gunInterface = GetComponentInChildren<GunInterface>();
+
+        instantiatedTracer = Instantiate(tracerEffect, gunEffectsHolder);
+        instantiatedMuzzleFlash = Instantiate(muzzleFlash, gunEffectsHolder);
 
         instantiatedAltFireController = Instantiate(altFireController, weaponPos);
         altFire = instantiatedAltFireController.GetComponent<altFireController>().altFireScript as altFireBase;
@@ -49,5 +56,19 @@ public class WeaponTemplate : MonoBehaviour
     void Update()
     {
         
+    }
+
+    public int Mode
+    {
+        get
+        {
+            return currentMode;
+        }
+
+        set
+        {
+            currentMode = value;
+            gunInterface.SetText(value.ToString());
+        }
     }
 }
