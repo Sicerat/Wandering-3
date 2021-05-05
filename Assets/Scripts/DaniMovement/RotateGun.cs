@@ -7,8 +7,13 @@ public class RotateGun : MonoBehaviour {
     private Quaternion desiredRotation;
     private float rotationSpeed = 5f;
 
+    private void Start()
+    {
+        grappling = (GrapplingGun)GetComponentInParent<WeaponTemplate>().altFire;
+    }
+
     void Update() {
-        if (!grappling.IsGrappling()) {
+        if (grappling != null && !grappling.IsGrappling()) {
             desiredRotation = transform.parent.rotation;
         }
         else {

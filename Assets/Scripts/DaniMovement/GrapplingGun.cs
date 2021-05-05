@@ -1,7 +1,7 @@
 using UnityEngine;
 using TMPro;
 
-public class GrapplingGun : MonoBehaviour {
+public class GrapplingGun : altFireBase {
 
     private LineRenderer lr;
     private Vector3 grapplePoint;
@@ -15,74 +15,22 @@ public class GrapplingGun : MonoBehaviour {
     private float maxDistance = 100f;
     private SpringJoint joint;
     public float jointSpring = 4.5f, jointDamper = 7f, jointMassScale = 4.5f;
-    private int mode = 1;
     public GameObject gunInterface;
 
     Vector3 shootDirection;
-    public Shot shot;
-    public GameObject hitDecal;
-    public ParticleSystem gunTracer;
-    public ParticleSystem muzzleFlash;
-    public GameObject impactEffect;
-    public float gunDamage = 25f;
-    public float impactForce = 30f;
-    public float spreading = 0.1f;
+
     private Vector3 shootDir;
-    private RecoilGun gunRecoil;
 
-    public int Mode
-    {
-        get
-        {
-            return mode;
-        }
-
-        set
-        {
-            mode = value;
-            gunInterface.GetComponent<TextMeshPro>().text = value.ToString();
-        }
-    }
 
     void Awake() {
         lr = GetComponent<LineRenderer>();
-        gunRecoil = GetComponentInParent<RecoilGun>();
+        camera = GetComponentInParent<PlayerInput>().camera;
+        player = GetComponentInParent<PlayerInput>().player;
+        gunTip = GetComponentInParent<WeaponTemplate>().gunTip;
     }
 
     void Update() {
-        if (Input.GetMouseButtonDown(0)) {
-            ChooseActionLMBDown();
-        }
-        else if (Input.GetMouseButtonUp(0)) {
-            ChooseActionLMBUp();
-        }
 
-        if (Input.GetMouseButton(1))
-        {
-            ChooseActionRMB();
-            print("RMB pressed!");
-        }
-        else if (Input.GetMouseButtonUp(1))
-        {
-            ChooseActionRMBUp();
-            print("RMB released!");
-        }
-
-        if (Input.GetMouseButton(2))
-        {
-            ChooseActionMMB();
-            print("RMB pressed!");
-        }
-        else if (Input.GetMouseButtonUp(2))
-        {
-            ChooseActionMMBUp();
-            print("RMB released!");
-        }
-
-        if (Input.GetAxis("Mouse ScrollWheel") != 0)
-        {
-            SwitchMode(Input.GetAxis("Mouse ScrollWheel"));
-        }
     }
 
     //Called after Update
@@ -90,188 +38,59 @@ public class GrapplingGun : MonoBehaviour {
         DrawRope();
     }
 
-
-    ///Choose function based on current gun mode
-    void ChooseActionLMBDown()
+    public override void DoActionsLMB()
     {
-        switch (mode)
-        {
-            case 0:
-                return;
-            case 1:
-                Shoot();
-                break;
-            case 2:
-                StartGrapple();
-                break;
-        }
+        throw new System.NotImplementedException();
     }
 
-    void ChooseActionLMBUp()
-    {
-        switch (mode)
-        {
-            case 0:
-                return;
-            case 1:
-                return;
-            case 2:
-                StopGrapple();
-                break;
-        }
+
+    public override void DoActionsLMBDown() {
+        StartGrapple();
     }
 
-    void ChooseActionRMB()
+    public override void DoActionsLMBUp()
     {
-        switch (mode)
-        {
-            case 0:
-                return;
-            case 1:
-                Shoot();
-                break;
-            case 2:
-                PullOnGrapple();
-                break;
-        }
+        lr.positionCount = 0;
+        Destroy(joint);
+        if (grappleAnchor != null) Destroy(grappleAnchor);
     }
 
-    void ChooseActionRMBUp()
+    public override void DoActionsMMB()
     {
-        switch (mode)
-        {
-            case 0:
-                return;
-            case 1:
-                Shoot();
-                break;
-            case 2:
-                if (joint != null) currentPullSpeed = defaultPullSpeed;
-                break;
-        }
+        StretchGrapple();
     }
 
-    void ChooseActionMMB()
+    public override void DoActionsMMBUp()
     {
-        switch (mode)
-        {
-            case 0:
-                return;
-            case 1:
-                return;
-            case 2:
-                StretchGrapple();
-                break;
-        }
+        if (joint != null) currentStretchSpeed = defaultStretchSpeed;
     }
 
-    void ChooseActionMMBUp()
+    public override void DoActionsRMB()
     {
-        switch (mode)
-        {
-            case 0:
-                return;
-            case 1:
-                return;
-            case 2:
-                if (joint != null) currentStretchSpeed = defaultStretchSpeed;
-                break;
-        }
+        PullOnGrapple();
     }
 
-    void SwitchMode(float direction)
+    public override void DoActionsRMBUp()
     {
-        if (direction > 0)
-        {
-            if (this.Mode == 2)
-            {
-                this.Mode = 0;
-                return;
-            }
-            else
-            {
-                this.Mode++;
-                return;
-            }
-        }
-        else
-        {
-            if (this.Mode == 0)
-            {
-                this.Mode = 2;
-                return;
-            }
-            else
-            {
-                this.Mode--;
-                return;
-            }
-        }
+        if (joint != null) currentPullSpeed = defaultPullSpeed;
     }
-
-    ///Call whenever we want to shoot
-    void Shoot()
-    {
-        RaycastHit hit;
-
-        float dispersionX = Random.Range(-spreading, +spreading);
-        float dispersionY = Random.Range(-spreading, +spreading);
-        shootDir = camera.transform.TransformDirection(Vector3.forward).normalized + new Vector3(dispersionX, dispersionY, 0);
-
-        gunTracer.Emit(1);
-        muzzleFlash.Play();
-        gunRecoil.DoRecoil();
-
-        if (Physics.Raycast(camera.transform.position,shootDir, out hit, Mathf.Infinity, whatIsGrappleable))
-        {
-            shootDirection = hit.point - camera.transform.position;
-            //shot.Show(transform.position, hit.point);
-            GameObject impactGO = Instantiate(impactEffect, hit.point, Quaternion.LookRotation(hit.normal));
-            Destroy(impactGO, 2);
-            if (hit.transform.GetComponent<RagdollEnemy>() != null || hit.transform.GetComponentInParent<RagdollEnemy>() != null)
-            {
-                RagdollEnemy enemy = null;
-                if (hit.transform.GetComponent<RagdollEnemy>() != null)
-                {
-                    enemy = hit.transform.GetComponent<RagdollEnemy>();
-                }
-                else
-                {
-                    enemy = hit.transform.GetComponentInParent<RagdollEnemy>();
-                }
-                enemy.ReceiveDamage(gunDamage, hit.transform.gameObject, shootDir);
-            }
-            else if (hit.rigidbody != null)
-            {
-                hit.rigidbody.AddForce(-hit.normal * impactForce);
-                SpawnDecal(hit);
-            }
-            else
-            {
-                SpawnDecal(hit);
-            }
-            
-        }
+    /// <summary>
+    /// Call whenever we want to stop a grapple
+    /// </summary>
+    void DoActionLMBUp() {
+        lr.positionCount = 0;
+        Destroy(joint);
+        if (grappleAnchor != null) Destroy(grappleAnchor);
     }
-    
-
-    //Function for spawning decals on everything
-    private void SpawnDecal(RaycastHit hitInfo)
-    {
-        var decal = Instantiate(hitDecal);
-
-        decal.transform.forward = hitInfo.normal * -1f;
-        decal.transform.position = hitInfo.point;
-        decal.transform.parent = hitInfo.transform;
-    }
-
 
     /// <summary>
     /// Call whenever we want to start a grapple
     /// </summary>
-    void StartGrapple() {
+    void StartGrapple()
+    {
         RaycastHit hit;
-        if (Physics.Raycast(camera.position, camera.forward, out hit, maxDistance, whatIsGrappleable)) {
+        if (Physics.Raycast(camera.position, camera.forward, out hit, maxDistance, whatIsGrappleable))
+        {
 
             joint = player.gameObject.AddComponent<SpringJoint>();
             joint.autoConfigureConnectedAnchor = false;
@@ -314,16 +133,6 @@ public class GrapplingGun : MonoBehaviour {
             lr.positionCount = 2;
             currentGrapplePosition = gunTip.position;
         }
-    }
-
-
-    /// <summary>
-    /// Call whenever we want to stop a grapple
-    /// </summary>
-    void StopGrapple() {
-        lr.positionCount = 0;
-        Destroy(joint);
-        if (grappleAnchor != null) Destroy(grappleAnchor);
     }
 
     /// <summary>
