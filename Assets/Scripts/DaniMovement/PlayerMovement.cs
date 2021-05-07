@@ -16,10 +16,14 @@ public class PlayerMovement : MonoBehaviour {
     private float xRotation;
     private float sensitivity = 50f;
     private float sensMultiplier = 1f;
+    private float sensScopedModifier = 1f;
     
     //Movement
     public float moveSpeed = 4500;
+    public float defaultMaxSpeed = 20;
     public float maxSpeed = 20;
+    public float maxSpeedScopedModifier = 1f;
+    public float modifierOnScoped = 1f;
     public bool grounded;
     public LayerMask whatIsGround;
     
@@ -127,20 +131,21 @@ public class PlayerMovement : MonoBehaviour {
         if (y < 0 && yMag < -maxSpeed) y = 0;
 
         //Some multipliers
-        float multiplier = 1f, multiplierV = 1f;
+        float multiplier = 1f, multiplierV = 1f, multiplierScoped = modifierOnScoped;
         
         // Movement in air
         if (!grounded) {
             multiplier = 0.5f;
             multiplierV = 0.5f;
+            multiplierScoped = 1f;
         }
         
         // Movement while sliding
         if (grounded && crouching) multiplierV = 0f;
 
         //Apply forces to move player
-        rb.AddForce(orientation.transform.forward * y * moveSpeed * Time.deltaTime * multiplier * multiplierV);
-        rb.AddForce(orientation.transform.right * x * moveSpeed * Time.deltaTime * multiplier);
+        rb.AddForce(orientation.transform.forward * y * moveSpeed * Time.deltaTime * multiplier * multiplierV * modifierOnScoped);
+        rb.AddForce(orientation.transform.right * x * moveSpeed * Time.deltaTime * multiplier * modifierOnScoped);
     }
 
     private void Jump() {
@@ -168,8 +173,12 @@ public class PlayerMovement : MonoBehaviour {
     
     private float desiredX;
     private void Look() {
-        float mouseX = Input.GetAxis("Mouse X") * sensitivity * Time.fixedDeltaTime * sensMultiplier;
-        float mouseY = Input.GetAxis("Mouse Y") * sensitivity * Time.fixedDeltaTime * sensMultiplier;
+
+        float sensScopedMultiplier = sensScopedModifier;
+        if (!grounded) sensScopedMultiplier = 1f;
+
+        float mouseX = Input.GetAxis("Mouse X") * sensitivity * Time.fixedDeltaTime * sensMultiplier * sensScopedMultiplier;
+        float mouseY = Input.GetAxis("Mouse Y") * sensitivity * Time.fixedDeltaTime * sensMultiplier * sensScopedMultiplier;
 
         //Find current look rotation
         Vector3 rot = playerCam.transform.localRotation.eulerAngles;
@@ -265,6 +274,22 @@ public class PlayerMovement : MonoBehaviour {
 
     private void StopGrounded() {
         grounded = false;
+    }
+
+    public void SetScopedSpeedModifier(float value)
+    {
+        modifierOnScoped = value;
+        maxSpeed = defaultMaxSpeed * value;
+    }
+
+    public void SetScopedSensModifier(float value)
+    {
+        sensScopedModifier = value;
+    }
+
+    public void ScaleSensitivity(float value)
+    {
+        sensitivity *= value;
     }
     
 }

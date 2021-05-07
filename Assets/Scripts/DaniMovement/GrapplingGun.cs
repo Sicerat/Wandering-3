@@ -154,7 +154,7 @@ public class GrapplingGun : altFireBase {
 
         currentStretchSpeed += stretchAcceleration;
 
-        joint.maxDistance += currentPullSpeed * Time.fixedDeltaTime;
+        joint.maxDistance += currentStretchSpeed * Time.fixedDeltaTime;
     }
 
     private Vector3 currentGrapplePosition;

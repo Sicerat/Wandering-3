@@ -14,6 +14,11 @@ public class RecoilGun : MonoBehaviour
     private Quaternion desiredRot;
     private Quaternion recoilRot;
 
+    private void Awake()
+    {
+        defaultRot = transform.localRotation;
+    }
+
     void Update()
     {
         //defaultRot = transform.parent.rotation;
@@ -21,7 +26,7 @@ public class RecoilGun : MonoBehaviour
         if (inRecoil)
         {
 
-            if(transform.localRotation.eulerAngles.x - 10f <= recoilRot.eulerAngles.x & !goingBack & transform.localRotation.eulerAngles.x > 180f)
+            if(transform.localRotation.eulerAngles.z - 10f <= recoilRot.eulerAngles.z & !goingBack & transform.localRotation.eulerAngles.z > 180f)
             {
                 goingBack = true;
             }
@@ -52,6 +57,6 @@ public class RecoilGun : MonoBehaviour
     {
         goingBack = false;
         inRecoil = true;
-        recoilRot = Quaternion.Euler(transform.localRotation.eulerAngles + new Vector3(-recoilAngle, 0));
+        recoilRot = Quaternion.Euler(transform.localRotation.eulerAngles + new Vector3(0, 0, -recoilAngle));
     }
 }

@@ -5,11 +5,11 @@ using TMPro;
 
 public class GunInterface : MonoBehaviour
 {
-    TextMeshPro text;
+    public TextMeshPro mainText, subText;
 
     private void Awake()
     {
-        text = GetComponent<TextMeshPro>();
+       
     }
 
     // Start is called before the first frame update
@@ -24,8 +24,13 @@ public class GunInterface : MonoBehaviour
         
     }
 
-    public void SetText(string addText)
+    public void SetMainText(string setText)
     {
-        text.text = addText;
+        mainText.text = setText;
+    }
+
+    public void SetSubText(string setText)
+    {
+        subText.text = setText;
     }
 }

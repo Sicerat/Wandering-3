@@ -13,10 +13,12 @@ public class RotateGun : MonoBehaviour {
     }
 
     void Update() {
-        if (grappling != null && !grappling.IsGrappling()) {
+        if (grappling == null || !grappling.IsGrappling())
+        {
             desiredRotation = transform.parent.rotation;
         }
-        else {
+        else
+        {
             desiredRotation = Quaternion.LookRotation(grappling.GetGrapplePoint() - transform.position);
         }
 

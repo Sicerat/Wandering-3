@@ -9,8 +9,9 @@ public class ShootingSystem : MonoBehaviour
     public WeaponTemplate weapon;
 
     Vector3 shootDir;
-    RecoilGun gunRecoil;
+    public RecoilGun gunRecoil;
     public float nextTimeToFire = 0f;
+    public float burstStartTime = 0f;
 
 
     void Start()
@@ -29,12 +30,20 @@ public class ShootingSystem : MonoBehaviour
     public void Shoot(Vector3 raycastStart, Vector3 shootDirection)
     {
         RaycastHit hit;
-        nextTimeToFire = Time.time + 1f / weapon.fireRate;
+        nextTimeToFire = Time.time + (1f / weapon.fireRate) * Time.timeScale;
+        weapon.CurrentAmmo--;
+
+        float spreading = weapon.Spreading + weapon.currentBurstPenalty;
+        if(Time.time - burstStartTime > weapon.normalBurstDuration && weapon.currentBurstPenalty < weapon.maxBurstPenalty)
+        {
+            weapon.currentBurstPenalty += weapon.burstPenaltySpeed;
+        }
 
         //Actual spreading randomization
-        float dispersionX = Random.Range(-weapon.spreading, +weapon.spreading);
-        float dispersionY = Random.Range(-weapon.spreading, +weapon.spreading);
-        shootDir = shootDirection + new Vector3(dispersionX, dispersionY, 0);
+        float dispersionX = Random.Range(-spreading, +spreading);
+        float dispersionY = Random.Range(-spreading, +spreading);
+        float dispersionZ = Random.Range(-spreading, +spreading);
+        shootDir = new Vector3(shootDirection.x + dispersionX, shootDirection.y + dispersionY, shootDirection.z + dispersionZ);
 
         weapon.instantiatedTracer.Emit(1);
         weapon.instantiatedMuzzleFlash.Play();
@@ -114,5 +123,32 @@ public class ShootingSystem : MonoBehaviour
             }
         }
     }
+
+    public void StartReload()
+    {
+        if (!weapon.IsReloading)
+        {
+            weapon.IsReloading = true;
+            Invoke("FinishReload", weapon.reloadTime);
+        }
+    }
+
+    private void FinishReload()
+    {
+        weapon.CurrentAmmo = weapon.clipSize;
+        weapon.IsReloading = false;
+    }
+
+    public void Zoom()
+    {
+        weapon.isZoomed = true;
+    }
+
+    public void Unzoom()
+    {
+        weapon.isZoomed = false;
+    }
+
+
 
 }

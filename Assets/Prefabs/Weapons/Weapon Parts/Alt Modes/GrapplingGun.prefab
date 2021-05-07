@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 695617688834959747}
   - component: {fileID: 7165945428212831945}
   - component: {fileID: 5029666001582917718}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: GrapplingGun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -51,11 +51,11 @@ MonoBehaviour:
   gunTip: {fileID: 0}
   camera: {fileID: 0}
   player: {fileID: 0}
-  defaultPullSpeed: 0
+  defaultPullSpeed: 5
   defaultStretchSpeed: 0
-  pullAcceleration: 0.01
+  pullAcceleration: 0.03
   stretchAcceleration: 0.01
-  jointSpring: 4.5
+  jointSpring: 20
   jointDamper: 7
   jointMassScale: 4.5
   gunInterface: {fileID: 0}
