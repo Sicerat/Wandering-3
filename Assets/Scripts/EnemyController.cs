@@ -26,7 +26,10 @@ public class EnemyController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        _target = PlayerManager.instance.player.transform;
+        if (PlayerManager.instance.player)
+        {
+            _target = PlayerManager.instance.player.transform;
+        }
         _agent = GetComponent<NavMeshAgent>();
         _animator = GetComponent <Animator>();
     }
@@ -34,6 +37,14 @@ public class EnemyController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!_target)
+        {
+            HandleStatus();
+            _status = STATUS.Patrol;
+            
+            return;
+        }
+        
         float distance = Vector3.Distance(_target.position, transform.position);
 
         if (distance <= lookRadius)
