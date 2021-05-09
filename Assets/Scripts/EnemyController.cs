@@ -94,6 +94,11 @@ public class EnemyController : MonoBehaviour
 
     private void Patrol()
     {
+        if (_patrolIndex >= waypoints.Count)
+        {
+            return;
+        }
+        
         Vector3 target = waypoints[_patrolIndex].transform.position;
         float distance = Vector3.Distance(target, transform.position);
         
