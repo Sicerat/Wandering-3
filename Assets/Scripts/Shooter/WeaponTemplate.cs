@@ -15,7 +15,6 @@ public class WeaponTemplate : MonoBehaviour
     public float clipSize = 15f;
     public float currentAmmo = 15f;
     public float reloadTime = 2f;
-    public bool isReloading = false;
     public bool isZoomed = false;
     public bool isAutomatic = false;
     public float spreading = 0.01f;
@@ -47,6 +46,7 @@ public class WeaponTemplate : MonoBehaviour
     public GameObject impactEffect;
     public float recoilAngle = 30f;
 
+    private bool _isReloading = false;
 
     private void Awake()
     {
@@ -110,11 +110,11 @@ public class WeaponTemplate : MonoBehaviour
     {
         get
         {
-            return isReloading;
+            return _isReloading;
         }
         set
         {
-            isReloading = value;
+            _isReloading = value;
             if (value) gunInterface.SetSubText("R");
         }
     }
@@ -139,7 +139,7 @@ public class WeaponTemplate : MonoBehaviour
         reloadTime = weapon.reloadTime;
         isAutomatic = weapon.isAutomatic;
 
-        isReloading = false;
+        _isReloading = false;
         isZoomed = false;
 
         spreading = weapon.spreading;

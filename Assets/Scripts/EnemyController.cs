@@ -8,7 +8,9 @@ using UnityEngine.AI;
 enum STATUS {
     Idle = 0,
     Chase = 1,
-    Patrol = 2
+    Patrol = 2,
+    Cover = 3,
+    Attack = 4
 }
 
 public class EnemyController : MonoBehaviour
@@ -20,6 +22,7 @@ public class EnemyController : MonoBehaviour
     private NavMeshAgent _agent;
     private Animator _animator;
     private int _patrolIndex = 0;
+    private ShootingSystem _shootingSystem;
     private STATUS _status = STATUS.Idle;
     private static readonly int Status = Animator.StringToHash("Status");
 
@@ -31,7 +34,8 @@ public class EnemyController : MonoBehaviour
             _target = PlayerManager.instance.player.transform;
         }
         _agent = GetComponent<NavMeshAgent>();
-        _animator = GetComponent <Animator>();
+        _animator = GetComponent<Animator>();
+        _shootingSystem = GetComponent<ShootingSystem>();
     }
 
     // Update is called once per frame
@@ -72,7 +76,8 @@ public class EnemyController : MonoBehaviour
                 Idle();
                 break;
             case STATUS.Chase:
-                Chase();
+                // Chase();
+                Attack();
                 break;
             case STATUS.Patrol:
                 Patrol();
@@ -128,6 +133,16 @@ public class EnemyController : MonoBehaviour
                 _patrolIndex = 0;
             }
         }
+    }
+    
+    private void Attack() {
+        if (_shootingSystem.weapon.CurrentAmmo <= 0) {
+            _shootingSystem.StartReload();
+            return;
+        }
+        
+        Vector3 direction = (_target.position - transform.position).normalized;
+        _shootingSystem.Shoot(transform.position, direction);
     }
 
     private void OnDrawGizmosSelected()

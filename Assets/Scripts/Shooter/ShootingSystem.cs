@@ -29,6 +29,11 @@ public class ShootingSystem : MonoBehaviour
     //Universal weapon shot, using values from Weapon Template
     public void Shoot(Vector3 raycastStart, Vector3 shootDirection)
     {
+        if (nextTimeToFire > Time.time || weapon.currentAmmo <= 0)
+        {
+            return;
+        }
+        
         RaycastHit hit;
         nextTimeToFire = Time.time + (1f / weapon.fireRate) * Time.timeScale;
         weapon.CurrentAmmo--;
