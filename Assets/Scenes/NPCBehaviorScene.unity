@@ -3569,8 +3569,8 @@ MonoBehaviour:
   hittableLayers:
     serializedVersion: 2
     m_Bits: 896
-  hitDamage: 2
-  fireRate: 10
+  hitDamage: 0
+  fireRate: 100
   clipSize: 100
   spreading: 0.01
   reloadTime: 2

@@ -36,7 +36,7 @@ public class WeaponTemplate : MonoBehaviour
     [Tooltip("Max spreading penalty in case of exceeding normalBurstDuration")]
     public float maxBurstPenalty = 0.01f;
 
-    private float _currentAmmo = 15f;
+    private float _currentAmmo;
 
     private bool _isZoomed;
     public bool IsZoomed { get; set; } = false;
@@ -84,6 +84,7 @@ public class WeaponTemplate : MonoBehaviour
         _gunEffectsHolder = instantiatedWeapon.GetComponentInChildren<GunEffectsHolder>().gameObject.transform;
         _gunInterface = GetComponentInChildren<GunInterface>();
         _gunInterface.SetSubText(_currentAmmo.ToString());
+        CurrentAmmo = clipSize;
 
         if (tracerEffect != null) instantiatedTracer = Instantiate(tracerEffect, _gunEffectsHolder);
         if (muzzleFlash != null) instantiatedMuzzleFlash = Instantiate(muzzleFlash, _gunEffectsHolder);
