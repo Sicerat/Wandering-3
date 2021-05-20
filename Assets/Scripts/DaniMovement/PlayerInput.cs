@@ -88,7 +88,6 @@ public class PlayerInput : MonoBehaviour
             shootingSystem.Shoot(camera.transform.position, camera.forward);
         }
         else if (shootingSystem.weapon.Mode == 2) shootingSystem.weapon.altFire.DoActionsLMBDown();
-        else if (shootingSystem.weapon.CurrentAmmo <= 0) shootingSystem.StartReload();
     }
 
     public void DoActionsLMB()
@@ -96,7 +95,6 @@ public class PlayerInput : MonoBehaviour
         if (shootingSystem.weapon.Mode == 1 && Time.time >= shootingSystem.nextTimeToFire && shootingSystem.weapon.isAutomatic)
         {
             if (shootingSystem.weapon.CurrentAmmo > 0) shootingSystem.Shoot(camera.transform.position, camera.forward);
-            else shootingSystem.StartReload();
         }
     }
 

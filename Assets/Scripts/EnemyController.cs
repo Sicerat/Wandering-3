@@ -136,11 +136,7 @@ public class EnemyController : MonoBehaviour
     }
     
     private void Attack() {
-        if (_shootingSystem.weapon.CurrentAmmo <= 0) {
-            _shootingSystem.StartReload();
-            return;
-        }
-        
+
         Vector3 direction = (_target.position - transform.position).normalized;
         _shootingSystem.Shoot(transform.position, direction);
     }
