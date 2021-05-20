@@ -26,10 +26,15 @@ public class ShootingSystem : MonoBehaviour
         
     }
 
+    public bool CanShoot()
+    {
+        return nextTimeToFire <= Time.time && weapon.CurrentAmmo > 0;
+    }
+
     //Universal weapon shot, using values from Weapon Template
     public void Shoot(Vector3 raycastStart, Vector3 shootDirection)
     {
-        if (nextTimeToFire > Time.time || weapon.CurrentAmmo <= 0)
+        if (!CanShoot())
         {
             return;
         }

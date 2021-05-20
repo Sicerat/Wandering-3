@@ -5,7 +5,8 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
 
-enum STATUS {
+enum STATUS
+{
     Idle = 0,
     Chase = 1,
     Patrol = 2,
@@ -15,7 +16,6 @@ enum STATUS {
 
 public class EnemyController : MonoBehaviour
 {
-
     public float lookRadius = 10f;
     public List<Waypoint> waypoints;
     private Transform _target;
@@ -25,6 +25,7 @@ public class EnemyController : MonoBehaviour
     private ShootingSystem _shootingSystem;
     private STATUS _status = STATUS.Idle;
     private static readonly int Status = Animator.StringToHash("Status");
+    private static readonly int IsShooting = Animator.StringToHash("isShooting");
 
     // Start is called before the first frame update
     void Start()
@@ -33,6 +34,7 @@ public class EnemyController : MonoBehaviour
         {
             _target = PlayerManager.instance.player.transform;
         }
+
         _agent = GetComponent<NavMeshAgent>();
         _animator = GetComponent<Animator>();
         _shootingSystem = GetComponent<ShootingSystem>();
@@ -45,16 +47,16 @@ public class EnemyController : MonoBehaviour
         {
             HandleStatus();
             _status = STATUS.Patrol;
-            
+
             return;
         }
-        
+
         float distance = Vector3.Distance(_target.position, transform.position);
 
         if (distance <= lookRadius)
         {
-            _status = STATUS.Chase;
-            
+            _status = STATUS.Attack;
+
             if (distance <= _agent.stoppingDistance)
             {
                 FaceTarget();
@@ -64,23 +66,32 @@ public class EnemyController : MonoBehaviour
         {
             _status = STATUS.Patrol;
         }
-        
+
         HandleStatus();
     }
 
     void HandleStatus()
     {
+        _animator.SetInteger(Status, (int) _status);
+
+        if (_status != STATUS.Attack)
+        {
+            _animator.SetBool(IsShooting, false);
+        }
+
         switch (_status)
         {
             case STATUS.Idle:
                 Idle();
                 break;
             case STATUS.Chase:
-                // Chase();
-                Attack();
+                Chase();
                 break;
             case STATUS.Patrol:
                 Patrol();
+                break;
+            case STATUS.Attack:
+                Attack();
                 break;
             default:
                 _status = STATUS.Idle;
@@ -97,15 +108,13 @@ public class EnemyController : MonoBehaviour
 
     private void Idle()
     {
-            _agent.SetDestination(transform.position);
-            _animator.SetInteger(Status, (int)STATUS.Idle);
+        _agent.SetDestination(transform.position);
     }
 
     private void Chase()
     {
-            _agent.speed = 3.5f;
-            _agent.SetDestination(_target.position);
-            _animator.SetInteger(Status, (int)STATUS.Chase);
+        _agent.speed = 3.5f;
+        _agent.SetDestination(_target.position);
     }
 
     private void Patrol()
@@ -114,13 +123,12 @@ public class EnemyController : MonoBehaviour
         {
             return;
         }
-        
+
         Vector3 target = waypoints[_patrolIndex].transform.position;
         float distance = Vector3.Distance(target, transform.position);
-        
+
         _agent.SetDestination(target);
         _agent.speed = 0.5f;
-        _animator.SetInteger(Status, (int)STATUS.Patrol);
 
         if (distance < 10)
         {
@@ -134,13 +142,27 @@ public class EnemyController : MonoBehaviour
             }
         }
     }
-    
-    private void Attack() {
-        if (_shootingSystem.weapon.CurrentAmmo <= 0) {
+
+    private void Attack()
+    {
+        _agent.ResetPath();
+        _animator.SetBool(IsShooting, false);
+
+        if (_shootingSystem.weapon.CurrentAmmo <= 0)
+        {
             _shootingSystem.StartReload();
             return;
         }
-        
+
+        if (_shootingSystem.CanShoot())
+        {
+            FaceTarget();
+            _animator.SetBool(IsShooting, true);
+        }
+    }
+
+    public void Fire()
+    {
         Vector3 direction = (_target.position - transform.position).normalized;
         _shootingSystem.Shoot(transform.position, direction);
     }
