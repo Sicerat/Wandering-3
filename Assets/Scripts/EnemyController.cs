@@ -64,7 +64,7 @@ public class EnemyController : MonoBehaviour
         }
         else
         {
-            _status = STATUS.Patrol;
+            _status = CanPatrol() ? STATUS.Patrol : STATUS.Idle;
         }
 
         HandleStatus();
@@ -108,18 +108,25 @@ public class EnemyController : MonoBehaviour
 
     private void Idle()
     {
-        _agent.SetDestination(transform.position);
+        if (_agent.enabled == true) _agent.ResetPath();
+        _agent.enabled = false;
     }
 
     private void Chase()
     {
+        _agent.enabled = true;
         _agent.speed = 3.5f;
         _agent.SetDestination(_target.position);
     }
 
+    private bool CanPatrol()
+    {
+        return waypoints.Count > 0;
+    }
+
     private void Patrol()
     {
-        if (_patrolIndex >= waypoints.Count)
+        if (_patrolIndex >= waypoints.Count || !waypoints[_patrolIndex])
         {
             return;
         }
@@ -127,6 +134,7 @@ public class EnemyController : MonoBehaviour
         Vector3 target = waypoints[_patrolIndex].transform.position;
         float distance = Vector3.Distance(target, transform.position);
 
+        _agent.enabled = true;
         _agent.SetDestination(target);
         _agent.speed = 0.5f;
 
@@ -145,7 +153,9 @@ public class EnemyController : MonoBehaviour
 
     private void Attack()
     {
-        _agent.ResetPath();
+        if (_agent.enabled == true) _agent.ResetPath();
+        _agent.enabled = false;
+
         _animator.SetBool(IsShooting, false);
 
         if (_shootingSystem.weapon.CurrentAmmo <= 0)
