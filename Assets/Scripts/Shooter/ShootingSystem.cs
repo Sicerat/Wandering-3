@@ -29,19 +29,21 @@ public class ShootingSystem : MonoBehaviour
     //Universal weapon shot, using values from Weapon Template
     public void Shoot(Vector3 raycastStart, Vector3 shootDirection)
     {
-        if (nextTimeToFire > Time.time || weapon.currentAmmo <= 0)
+        if (nextTimeToFire > Time.time || weapon.CurrentAmmo <= 0)
         {
             return;
         }
         
         RaycastHit hit;
+        //Calculating "hit cooldown" based on weapon's fire rate. Multiplication by timeScale is needed to make fire rate independent from timeScale, which is highly questionable.
         nextTimeToFire = Time.time + (1f / weapon.fireRate) * Time.timeScale;
         weapon.CurrentAmmo--;
 
-        float spreading = weapon.Spreading + weapon.currentBurstPenalty;
-        if(Time.time - burstStartTime > weapon.normalBurstDuration && weapon.currentBurstPenalty < weapon.maxBurstPenalty)
+        //Calculating max spreading for this hit
+        float spreading = weapon.Spreading + weapon.CurrentBurstPenalty;
+        if(Time.time - burstStartTime > weapon.normalBurstDuration && weapon.CurrentBurstPenalty < weapon.maxBurstPenalty)
         {
-            weapon.currentBurstPenalty += weapon.burstPenaltySpeed;
+            weapon.CurrentBurstPenalty += weapon.burstPenaltySpeed;
         }
 
         //Actual spreading randomization
@@ -50,8 +52,9 @@ public class ShootingSystem : MonoBehaviour
         float dispersionZ = Random.Range(-spreading, +spreading);
         shootDir = new Vector3(shootDirection.x + dispersionX, shootDirection.y + dispersionY, shootDirection.z + dispersionZ);
 
-        weapon.instantiatedTracer.Emit(1);
-        weapon.instantiatedMuzzleFlash.Play();
+        if (weapon.instantiatedTracer != null) weapon.instantiatedTracer.Emit(1);
+        if (weapon.instantiatedMuzzleFlash != null) weapon.instantiatedMuzzleFlash.Play();
+
         if (gunRecoil != null) gunRecoil.DoRecoil(weapon.recoilAngle);
 
         if (Physics.Raycast(raycastStart, shootDir, out hit, Mathf.Infinity, weapon.hittableLayers))
@@ -146,12 +149,12 @@ public class ShootingSystem : MonoBehaviour
 
     public void Zoom()
     {
-        weapon.isZoomed = true;
+        weapon.IsZoomed = true;
     }
 
     public void Unzoom()
     {
-        weapon.isZoomed = false;
+        weapon.IsZoomed = false;
     }
 
 

@@ -175,6 +175,7 @@ public class PlayerMovement : MonoBehaviour {
     private void Look() {
 
         float sensScopedMultiplier = sensScopedModifier;
+        //Player rotation speed isn't affected by zooming while he's in air.
         if (!grounded) sensScopedMultiplier = 1f;
 
         float mouseX = Input.GetAxis("Mouse X") * sensitivity * Time.fixedDeltaTime * sensMultiplier * sensScopedMultiplier;

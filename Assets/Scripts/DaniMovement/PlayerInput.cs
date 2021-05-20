@@ -93,7 +93,7 @@ public class PlayerInput : MonoBehaviour
 
     public void DoActionsLMB()
     {
-        if (shootingSystem.weapon.currentMode == 1 && Time.time >= shootingSystem.nextTimeToFire && shootingSystem.weapon.isAutomatic)
+        if (shootingSystem.weapon.Mode == 1 && Time.time >= shootingSystem.nextTimeToFire && shootingSystem.weapon.isAutomatic)
         {
             if (shootingSystem.weapon.CurrentAmmo > 0) shootingSystem.Shoot(camera.transform.position, camera.forward);
             else shootingSystem.StartReload();
@@ -102,13 +102,13 @@ public class PlayerInput : MonoBehaviour
 
     public void DoActionsLMBUp()
     {
-        if (shootingSystem.weapon.currentMode == 1) shootingSystem.weapon.currentBurstPenalty = 0f;
+        if (shootingSystem.weapon.Mode == 1) shootingSystem.weapon.CurrentBurstPenalty = 0f;
         else shootingSystem.weapon.altFire.DoActionsLMBUp();
     }
 
     public void DoActionsRMBDown()
     {
-        if (shootingSystem.weapon.currentMode == 1)
+        if (shootingSystem.weapon.Mode == 1)
         {
             shootingSystem.Zoom();
             scope.DoScope();
@@ -120,13 +120,13 @@ public class PlayerInput : MonoBehaviour
 
     public void DoActionsRMB()
     {
-        if (shootingSystem.weapon.currentMode == 1) return;
+        if (shootingSystem.weapon.Mode == 1) return;
         else shootingSystem.weapon.altFire.DoActionsRMB();
     }
 
     public void DoActionsRMBUp()
     {
-        if (shootingSystem.weapon.currentMode == 1)
+        if (shootingSystem.weapon.Mode == 1)
         {
             shootingSystem.Unzoom();
             scope.DoUnscope();
@@ -139,13 +139,13 @@ public class PlayerInput : MonoBehaviour
 
     public void DoActionsMMB()
     {
-        if (shootingSystem.weapon.currentMode == 1) return;
+        if (shootingSystem.weapon.Mode == 1) return;
         else shootingSystem.weapon.altFire.DoActionsMMB();
     }
 
     public void DoActionsMMBUp()
     {
-        if (shootingSystem.weapon.currentMode == 1) return;
+        if (shootingSystem.weapon.Mode == 1) return;
         else shootingSystem.weapon.altFire.DoActionsMMBUp();
     }
 
