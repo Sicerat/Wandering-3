@@ -144,6 +144,7 @@ public class GrapplingGun : altFireBase {
 
         currentPullSpeed += pullAcceleration;
 
+        joint.spring += currentPullSpeed * Time.fixedDeltaTime;
         joint.maxDistance -= currentPullSpeed * Time.fixedDeltaTime;
         print("Current joint max distance: " + joint.maxDistance);
     }

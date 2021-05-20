@@ -28,7 +28,7 @@ public class ShootingSystem : MonoBehaviour
 
     public bool CanShoot()
     {
-        return nextTimeToFire <= Time.time && weapon.CurrentAmmo > 0;
+        return nextTimeToFire <= Time.time && weapon.CurrentAmmo > 0 && !weapon.IsReloading;
     }
 
     //Universal weapon shot, using values from Weapon Template
@@ -36,6 +36,7 @@ public class ShootingSystem : MonoBehaviour
     {
         if (!CanShoot())
         {
+            if (weapon.CurrentAmmo <= 0) StartReload();
             return;
         }
         
@@ -90,6 +91,11 @@ public class ShootingSystem : MonoBehaviour
             else
             {
                 SpawnDecal(hit);
+            }
+
+            if(hit.transform.gameObject.tag == "Player")
+            {
+                hit.transform.gameObject.GetComponentInParent<PlayerController>().ReceiveDamage(weapon.hitDamage);
             }
 
         }
