@@ -148,17 +148,35 @@ public class GrapplingGun : altFireBase {
         RaycastHit hit;
         if (Physics.Raycast(camera.position, camera.forward, out hit, maxDistance, whatIsGrappleable))
         {
-            
-            float distanceFromPoint = hit.distance;
             if (hit.transform.gameObject.GetComponent<Grappable>() != null)
             {
-                //grappleAnchor = hit.transform.gameObject.GetComponent<Grappable>().CreateJointAnchor(hit);
-                //grapplePoint = grappleAnchor.transform.localPosition;
+                hit.transform.gameObject.GetComponent<Rigidbody>().AddForce((hit.point - transform.position).normalized * simplifiedGrappleSlapForce);
+                currentGrapplePosition = gunTip.position;
+                grapplePoint = hit.point;
+                lr.positionCount = 2;
+                _isGrappling = true;
+                Invoke("StopSimplifiedGrapple", 0.25f);
+            }
+            else
+            {
+                _playerController.playerRigidbody.AddForce(Vector3.up * 1000f);
+                Invoke("DoSimplifiedGrapple", 0.1f);
+            }
+        }
+    }
+
+    void DoSimplifiedGrapple()
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(camera.position, camera.forward, out hit, maxDistance, whatIsGrappleable))
+        {
+            if (hit.transform.gameObject.GetComponent<Grappable>() != null)
+            {
                 hit.transform.gameObject.GetComponent<Rigidbody>().AddForce((hit.point - transform.position).normalized * simplifiedGrappleSlapForce);
             }
             else
             {
-                _playerController.playerRigidbody.AddForce((hit.point - transform.position).normalized * simplifiedGrapplePullForce);
+                _playerController.playerRigidbody.AddForce((hit.point - camera.position).normalized * simplifiedGrapplePullForce);
             }
             currentGrapplePosition = gunTip.position;
             grapplePoint = hit.point;
