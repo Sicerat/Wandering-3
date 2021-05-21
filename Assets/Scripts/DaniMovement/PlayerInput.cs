@@ -10,6 +10,7 @@ public class PlayerInput : MonoBehaviour
     public ShootingSystem shootingSystem;
     public Scope scope;
     public CameraController cameraController;
+    private PlayerController _playerController;
     public PlayerMovement playerMovement;
     // Start is called before the first frame update
     void Start()
@@ -17,6 +18,7 @@ public class PlayerInput : MonoBehaviour
         shootingSystem = GetComponent<ShootingSystem>();
         scope = GetComponentInChildren<Scope>();
         cameraController = GetComponentInChildren<CameraController>();
+        _playerController = GetComponent<PlayerController>();
         playerMovement = GetComponentInChildren<PlayerMovement>();
     }
 
@@ -106,7 +108,7 @@ public class PlayerInput : MonoBehaviour
 
     public void DoActionsRMBDown()
     {
-        if (shootingSystem.weapon.Mode == 1)
+        if (shootingSystem.weapon.Mode == 1 && !_playerController.simplifiedGrappling)
         {
             shootingSystem.Zoom();
             scope.DoScope();
@@ -114,6 +116,11 @@ public class PlayerInput : MonoBehaviour
             playerMovement.SetScopedSpeedModifier(shootingSystem.weapon.zoomSpeedModifier);
             playerMovement.SetScopedSensModifier(shootingSystem.weapon.zoomRotateModifier);
         }
+        else if (_playerController.simplifiedGrappling)
+        {
+            shootingSystem.weapon.altFire.DoActionsLMBDown();
+        }
+        
     }
 
     public void DoActionsRMB()

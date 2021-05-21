@@ -9,10 +9,13 @@ public class PlayerController : MonoBehaviour
     public float maxHealth = 100f;
     private float _playerHealth;
     public TextMeshProUGUI healthBar;
+    public bool simplifiedGrappling = false;
+    public Rigidbody playerRigidbody;
 
     private void Awake()
     {
         PlayerHealth = maxHealth;
+        playerRigidbody = GetComponentInChildren<Rigidbody>();
     }
 
     public float PlayerHealth

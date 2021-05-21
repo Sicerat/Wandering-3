@@ -16,10 +16,16 @@ public class GrapplingGun : altFireBase {
     private SpringJoint joint;
     public float jointSpring = 4.5f, jointDamper = 7f, jointMassScale = 4.5f;
     public GameObject gunInterface;
+    [Space(10)]
+    public float simplifiedGrapplePullForce = 100f;
+    public float simplifiedGrappleSlapForce = 100f;
+    private bool _isGrappling = false;
 
     Vector3 shootDirection;
 
     private Vector3 shootDir;
+
+    private PlayerController _playerController;
 
 
     void Awake() {
@@ -27,6 +33,7 @@ public class GrapplingGun : altFireBase {
         camera = GetComponentInParent<PlayerInput>().camera;
         player = GetComponentInParent<PlayerInput>().player;
         gunTip = GetComponentInParent<WeaponTemplate>().gunTip;
+        _playerController = GetComponentInParent<PlayerController>();
     }
 
     void Update() {
@@ -45,7 +52,8 @@ public class GrapplingGun : altFireBase {
 
 
     public override void DoActionsLMBDown() {
-        StartGrapple();
+        if (!_playerController.simplifiedGrappling) StartGrapple();
+        else StartSimplifiedGrapple();
     }
 
     public override void DoActionsLMBUp()
@@ -135,6 +143,39 @@ public class GrapplingGun : altFireBase {
         }
     }
 
+    void StartSimplifiedGrapple()
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(camera.position, camera.forward, out hit, maxDistance, whatIsGrappleable))
+        {
+            
+            float distanceFromPoint = hit.distance;
+            if (hit.transform.gameObject.GetComponent<Grappable>() != null)
+            {
+                //grappleAnchor = hit.transform.gameObject.GetComponent<Grappable>().CreateJointAnchor(hit);
+                //grapplePoint = grappleAnchor.transform.localPosition;
+                hit.transform.gameObject.GetComponent<Rigidbody>().AddForce((hit.point - transform.position).normalized * simplifiedGrappleSlapForce);
+            }
+            else
+            {
+                _playerController.playerRigidbody.AddForce((hit.point - transform.position).normalized * simplifiedGrapplePullForce);
+            }
+            currentGrapplePosition = gunTip.position;
+            grapplePoint = hit.point;
+            lr.positionCount = 2;
+            _isGrappling = true;
+            Invoke("StopSimplifiedGrapple", 0.25f);
+        }
+    }
+
+    void StopSimplifiedGrapple()
+    {
+        _isGrappling = false;
+        lr.positionCount = 0;
+    }
+
+
+
     /// <summary>
     /// Pull up while grappling
     /// </summary>
@@ -162,11 +203,11 @@ public class GrapplingGun : altFireBase {
     
     void DrawRope() {
         //If not grappling, don't draw rope
-        if (!joint) return;
+        if (!joint && !_isGrappling) return;
 
-        if(grappleAnchor != null)
+        if (grappleAnchor != null)
         {
-            if ( (currentGrapplePosition-grappleAnchor.transform.position).magnitude < 1)
+            if ((currentGrapplePosition - grappleAnchor.transform.position).magnitude < 1)
             {
                 //currentGrapplePosition = Vector3.Lerp(currentGrapplePosition, grappleAnchor.transform.position, Time.deltaTime * 8f);
                 currentGrapplePosition = grappleAnchor.transform.position;
@@ -179,7 +220,7 @@ public class GrapplingGun : altFireBase {
                 //float yComp = hyp1 * Mathf.Cos(u * Mathf.Deg2Rad);
                 //float xComp = hyp1 * Mathf.Sin(u * Mathf.Deg2Rad);
 
-                
+
 
                 //Vector3 movementCorrection = new Vector3(yComp, 0, xComp);
                 currentGrapplePosition = currentGrapplePosition + (grappleAnchor.transform.position - currentGrapplePosition).normalized * 0.8f;
@@ -191,13 +232,17 @@ public class GrapplingGun : altFireBase {
         {
             currentGrapplePosition = Vector3.Lerp(currentGrapplePosition, grapplePoint, Time.deltaTime * 8f);
         }
-        
+
         lr.SetPosition(0, gunTip.position);
         lr.SetPosition(1, currentGrapplePosition);
+       
+
     }
 
     public bool IsGrappling() {
-        return joint != null;
+        if (!_playerController.simplifiedGrappling) return joint != null;
+        else return _isGrappling;
+
     }
 
     public Vector3 GetGrapplePoint() {
