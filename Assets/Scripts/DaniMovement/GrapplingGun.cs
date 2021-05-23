@@ -26,6 +26,12 @@ public class GrapplingGun : altFireBase {
     private Vector3 shootDir;
 
     private PlayerController _playerController;
+    public float sphereCastRadius = 0.1f;
+    [Space(10)]
+    public float hookSpeed = 0.1f;
+    public float distanceToGrapplePoint = 0f;
+    public float zeroGravityTime = 1f;
+    private bool _needsZeroGravity = false;
 
 
     void Awake() {
@@ -40,6 +46,24 @@ public class GrapplingGun : altFireBase {
 
     }
 
+    private void FixedUpdate()
+    {
+        if(_playerController.hookGrappling && _isGrappling)
+        {
+            if (distanceToGrapplePoint > 1f)
+            {
+                //_playerController.playerRigidbody.velocity = (grapplePoint - camera.position).normalized * hookSpeed;
+                _playerController.playerRigidbody.AddForce((grapplePoint - camera.position).normalized * hookSpeed * 10f);
+                distanceToGrapplePoint = (grapplePoint - camera.position).magnitude;
+            }
+            else
+            {
+                _needsZeroGravity = true;
+                StopHookGrapple();
+            }
+        }
+    }
+
     //Called after Update
     void LateUpdate() {
         DrawRope();
@@ -52,8 +76,9 @@ public class GrapplingGun : altFireBase {
 
 
     public override void DoActionsLMBDown() {
-        if (!_playerController.simplifiedGrappling) StartGrapple();
-        else StartSimplifiedGrapple();
+        if (!_playerController.simplifiedGrappling && !_playerController.hookGrappling) StartGrapple();
+        else if (_playerController.simplifiedGrappling) StartSimplifiedGrapple();
+        else if (_playerController.hookGrappling) DoHookGrapple();
     }
 
     public override void DoActionsLMBUp()
@@ -81,6 +106,10 @@ public class GrapplingGun : altFireBase {
     public override void DoActionsRMBUp()
     {
         if (joint != null) currentPullSpeed = defaultPullSpeed;
+        if(_playerController.hookGrappling)
+        {
+            StopHookGrapple();
+        }
     }
     /// <summary>
     /// Call whenever we want to stop a grapple
@@ -97,7 +126,8 @@ public class GrapplingGun : altFireBase {
     void StartGrapple()
     {
         RaycastHit hit;
-        if (Physics.Raycast(camera.position, camera.forward, out hit, maxDistance, whatIsGrappleable))
+        //if (Physics.Raycast(camera.position, camera.forward, out hit, maxDistance, whatIsGrappleable))
+        if (Physics.SphereCast(camera.position, sphereCastRadius, camera.forward, out hit, maxDistance, whatIsGrappleable))
         {
 
             joint = player.gameObject.AddComponent<SpringJoint>();
@@ -146,7 +176,7 @@ public class GrapplingGun : altFireBase {
     void StartSimplifiedGrapple()
     {
         RaycastHit hit;
-        if (Physics.Raycast(camera.position, camera.forward, out hit, maxDistance, whatIsGrappleable))
+        if (Physics.SphereCast(camera.position, sphereCastRadius, camera.forward, out hit, maxDistance, whatIsGrappleable))
         {
             if (hit.transform.gameObject.GetComponent<Grappable>() != null)
             {
@@ -168,7 +198,7 @@ public class GrapplingGun : altFireBase {
     void DoSimplifiedGrapple()
     {
         RaycastHit hit;
-        if (Physics.Raycast(camera.position, camera.forward, out hit, maxDistance, whatIsGrappleable))
+        if (Physics.SphereCast(camera.position, sphereCastRadius, camera.forward, out hit, maxDistance, whatIsGrappleable))
         {
             if (hit.transform.gameObject.GetComponent<Grappable>() != null)
             {
@@ -190,6 +220,48 @@ public class GrapplingGun : altFireBase {
     {
         _isGrappling = false;
         lr.positionCount = 0;
+    }
+
+    void DoHookGrapple()
+    {
+        RaycastHit hit;
+        if (Physics.SphereCast(camera.position, sphereCastRadius, camera.forward, out hit, maxDistance, whatIsGrappleable))
+        {
+            currentGrapplePosition = gunTip.position;
+            grapplePoint = hit.point;
+            lr.positionCount = 2;
+
+            if (hit.transform.gameObject.GetComponent<Grappable>() != null)
+            {
+                hit.transform.gameObject.GetComponent<Rigidbody>().AddForce((hit.point - transform.position).normalized * simplifiedGrappleSlapForce);
+            }
+            else
+            {
+                distanceToGrapplePoint = (hit.point - camera.position).magnitude;
+                if (_playerController.resetVelocityOnHookStart) _playerController.playerRigidbody.velocity = Vector3.zero;
+                _playerController.playerRigidbody.useGravity = false;
+                _isGrappling = true;
+            }
+        }
+    }
+
+    void StopHookGrapple()
+    {
+        _isGrappling = false;
+
+        lr.positionCount = 0;
+        if (_needsZeroGravity)
+        {
+            Invoke("ActivateGravity", zeroGravityTime);
+            _playerController.playerRigidbody.velocity = Vector3.zero;
+        }
+        else _playerController.playerRigidbody.useGravity = true;
+    }
+
+    void ActivateGravity()
+    {
+        _playerController.playerRigidbody.useGravity = true;
+        _needsZeroGravity = false;
     }
 
 

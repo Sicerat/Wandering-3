@@ -10,6 +10,8 @@ public class PlayerController : MonoBehaviour
     private float _playerHealth;
     public TextMeshProUGUI healthBar;
     public bool simplifiedGrappling = false;
+    public bool hookGrappling = false;
+    public bool resetVelocityOnHookStart = false;
     public Rigidbody playerRigidbody;
 
     private void Awake()

@@ -108,7 +108,7 @@ public class PlayerInput : MonoBehaviour
 
     public void DoActionsRMBDown()
     {
-        if (shootingSystem.weapon.Mode == 1 && !_playerController.simplifiedGrappling)
+        if (shootingSystem.weapon.Mode == 1 && !_playerController.simplifiedGrappling && !_playerController.hookGrappling)
         {
             shootingSystem.Zoom();
             scope.DoScope();
@@ -116,7 +116,7 @@ public class PlayerInput : MonoBehaviour
             playerMovement.SetScopedSpeedModifier(shootingSystem.weapon.zoomSpeedModifier);
             playerMovement.SetScopedSensModifier(shootingSystem.weapon.zoomRotateModifier);
         }
-        else if (_playerController.simplifiedGrappling)
+        else if (_playerController.simplifiedGrappling || _playerController.hookGrappling)
         {
             shootingSystem.weapon.altFire.DoActionsLMBDown();
         }
@@ -131,7 +131,7 @@ public class PlayerInput : MonoBehaviour
 
     public void DoActionsRMBUp()
     {
-        if (shootingSystem.weapon.Mode == 1)
+        if (shootingSystem.weapon.Mode == 1 && !_playerController.hookGrappling)
         {
             shootingSystem.Unzoom();
             scope.DoUnscope();

@@ -47,7 +47,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   whatIsGrappleable:
     serializedVersion: 2
-    m_Bits: 832
+    m_Bits: 4672
   gunTip: {fileID: 0}
   camera: {fileID: 0}
   player: {fileID: 0}
@@ -61,6 +61,10 @@ MonoBehaviour:
   gunInterface: {fileID: 0}
   simplifiedGrapplePullForce: 5000
   simplifiedGrappleSlapForce: 5000
+  sphereCastRadius: 0.5
+  hookSpeed: 10
+  distanceToGrapplePoint: 0
+  zeroGravityTime: 0.2
 --- !u!120 &7165945428212831945
 LineRenderer:
   m_ObjectHideFlags: 0

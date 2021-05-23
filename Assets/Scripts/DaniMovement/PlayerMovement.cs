@@ -24,6 +24,8 @@ public class PlayerMovement : MonoBehaviour {
     public float maxSpeed = 20;
     public float maxSpeedScopedModifier = 1f;
     public float modifierOnScoped = 1f;
+    public float multiplierInAir = 1f;
+    public float multiplierInAirV = 1f;
     public bool grounded;
     public LayerMask whatIsGround;
     
@@ -131,12 +133,14 @@ public class PlayerMovement : MonoBehaviour {
         if (y < 0 && yMag < -maxSpeed) y = 0;
 
         //Some multipliers
-        float multiplier = 1f, multiplierV = 1f, multiplierScoped = modifierOnScoped;
+        float multiplier = 1f;
+        float multiplierV = 1f;
+        float multiplierScoped = modifierOnScoped;
         
         // Movement in air
         if (!grounded) {
-            multiplier = 0.5f;
-            multiplierV = 0.5f;
+            multiplier = multiplierInAir;
+            multiplierV = multiplierInAirV;
             multiplierScoped = 1f;
         }
         
