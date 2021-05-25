@@ -22,6 +22,10 @@ public class PlayerMovement : MonoBehaviour {
     public float moveSpeed = 4500;
     public float defaultMaxSpeed = 20;
     public float maxSpeed = 20;
+    public float maxAirSpeed = 100;
+    public float maxFallSpeed = 30;
+    public float maxUpSpeed = 60;
+    public float maxHookSpeed = 60;
     public float maxSpeedScopedModifier = 1f;
     public float modifierOnScoped = 1f;
     public float multiplierInAir = 1f;
@@ -52,8 +56,11 @@ public class PlayerMovement : MonoBehaviour {
     private Vector3 normalVector = Vector3.up;
     private Vector3 wallNormalVector;
 
+    private PlayerController _playerController;
+
     void Awake() {
         rb = GetComponent<Rigidbody>();
+        _playerController = GetComponentInParent<PlayerController>();
     }
     
     void Start() {
@@ -65,6 +72,7 @@ public class PlayerMovement : MonoBehaviour {
     
     private void FixedUpdate() {
         Movement();
+        LimitMovement();
     }
 
     private void Update() {
@@ -150,6 +158,35 @@ public class PlayerMovement : MonoBehaviour {
         //Apply forces to move player
         rb.AddForce(orientation.transform.forward * y * moveSpeed * Time.deltaTime * multiplier * multiplierV * modifierOnScoped);
         rb.AddForce(orientation.transform.right * x * moveSpeed * Time.deltaTime * multiplier * modifierOnScoped);
+    }
+
+    void LimitMovement()
+    {
+        Vector3 horizontalVelocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+        Vector3 verticalVelocity = new Vector3(0, rb.velocity.y, 0);
+
+        
+        if (!_playerController.isGrappling)
+        {
+            if (horizontalVelocity.magnitude > maxAirSpeed)
+            {
+                horizontalVelocity = horizontalVelocity.normalized * maxSpeed;
+            }
+
+            if (verticalVelocity.y < -maxFallSpeed)
+            {
+                verticalVelocity = verticalVelocity.normalized * maxFallSpeed;
+            }
+            else if (verticalVelocity.y > maxUpSpeed)
+            {
+                verticalVelocity = verticalVelocity.normalized * maxUpSpeed;
+            }
+            rb.velocity = new Vector3(horizontalVelocity.x, verticalVelocity.y, horizontalVelocity.z);
+        }
+        else
+        {
+            if (rb.velocity.magnitude > maxHookSpeed) rb.velocity = rb.velocity.normalized * maxHookSpeed;
+        }
     }
 
     private void Jump() {
@@ -263,6 +300,7 @@ public class PlayerMovement : MonoBehaviour {
             //FLOOR
             if (IsFloor(normal)) {
                 grounded = true;
+                _playerController.isGrappling = false;
                 cancellingGrounded = false;
                 normalVector = normal;
                 CancelInvoke(nameof(StopGrounded));

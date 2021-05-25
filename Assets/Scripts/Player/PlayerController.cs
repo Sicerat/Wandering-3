@@ -12,6 +12,8 @@ public class PlayerController : MonoBehaviour
     public bool simplifiedGrappling = false;
     public bool hookGrappling = false;
     public bool resetVelocityOnHookStart = false;
+    public bool isGrappling = false;
+    public bool isGrounded = false;
     public Rigidbody playerRigidbody;
 
     private void Awake()

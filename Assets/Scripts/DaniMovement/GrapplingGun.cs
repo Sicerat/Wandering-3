@@ -241,6 +241,7 @@ public class GrapplingGun : altFireBase {
                 if (_playerController.resetVelocityOnHookStart) _playerController.playerRigidbody.velocity = Vector3.zero;
                 _playerController.playerRigidbody.useGravity = false;
                 _isGrappling = true;
+                _playerController.isGrappling = true;
             }
         }
     }
@@ -248,14 +249,9 @@ public class GrapplingGun : altFireBase {
     void StopHookGrapple()
     {
         _isGrappling = false;
-
         lr.positionCount = 0;
-        if (_needsZeroGravity)
-        {
-            Invoke("ActivateGravity", zeroGravityTime);
-            _playerController.playerRigidbody.velocity = Vector3.zero;
-        }
-        else _playerController.playerRigidbody.useGravity = true;
+        Invoke("ActivateGravity", zeroGravityTime);
+        if(_needsZeroGravity)_playerController.playerRigidbody.velocity = Vector3.zero;
     }
 
     void ActivateGravity()
