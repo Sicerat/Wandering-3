@@ -55,11 +55,11 @@ public class EnemyController : MonoBehaviour
 
         if (distance <= lookRadius)
         {
-            _status = STATUS.Attack;
-
+            _status = STATUS.Chase;
+            
             if (distance <= _agent.stoppingDistance)
             {
-                FaceTarget();
+                _status = STATUS.Attack;
             }
         }
         else
@@ -154,9 +154,9 @@ public class EnemyController : MonoBehaviour
     private void Attack()
     {
         if (_agent.enabled == true) _agent.ResetPath();
-        _agent.enabled = false;
 
         _animator.SetBool(IsShooting, false);
+        FaceTarget();
 
         if (_shootingSystem.weapon.CurrentAmmo <= 0)
         {
@@ -166,7 +166,6 @@ public class EnemyController : MonoBehaviour
 
         if (_shootingSystem.CanShoot())
         {
-            FaceTarget();
             _animator.SetBool(IsShooting, true);
         }
     }
