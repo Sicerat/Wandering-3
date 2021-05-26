@@ -12,7 +12,8 @@ public class GrapplingGun : altFireBase {
     public float pullAcceleration = 0.01f;
     public float stretchAcceleration = 0.01f;
     private float currentPullSpeed, currentStretchSpeed;
-    private float maxDistance = 100f;
+    public float maxDistance = 100f;
+    public float maxHookSpeed = 60f;
     private SpringJoint joint;
     public float jointSpring = 4.5f, jointDamper = 7f, jointMassScale = 4.5f;
     public GameObject gunInterface;
@@ -32,6 +33,7 @@ public class GrapplingGun : altFireBase {
     public float distanceToGrapplePoint = 0f;
     public float zeroGravityTime = 1f;
     private bool _needsZeroGravity = false;
+    private bool _hookedEnemy = false;
 
 
     void Awake() {
@@ -52,8 +54,11 @@ public class GrapplingGun : altFireBase {
         {
             if (distanceToGrapplePoint > 1f)
             {
-                //_playerController.playerRigidbody.velocity = (grapplePoint - camera.position).normalized * hookSpeed;
-                _playerController.playerRigidbody.AddForce((grapplePoint - camera.position).normalized * hookSpeed * 10f);
+                if (_playerController.playerRigidbody.velocity.magnitude < maxHookSpeed)
+                {
+                    //_playerController.playerRigidbody.velocity = (grapplePoint - camera.position).normalized * hookSpeed;
+                    _playerController.playerRigidbody.AddForce((grapplePoint - camera.position).normalized * hookSpeed * 1000f * Time.fixedDeltaTime);
+                }
                 distanceToGrapplePoint = (grapplePoint - camera.position).magnitude;
             }
             else
@@ -237,6 +242,11 @@ public class GrapplingGun : altFireBase {
             }
             else
             {
+                if (hit.transform.gameObject.GetComponent<EnemyController>())
+                {
+                    _playerController.playerRigidbody.AddForce(Vector3.up * 500f);
+                    _hookedEnemy = true;
+                }
                 distanceToGrapplePoint = (hit.point - camera.position).magnitude;
                 if (_playerController.resetVelocityOnHookStart) _playerController.playerRigidbody.velocity = Vector3.zero;
                 _playerController.playerRigidbody.useGravity = false;
@@ -246,12 +256,19 @@ public class GrapplingGun : altFireBase {
         }
     }
 
+
     void StopHookGrapple()
     {
         _isGrappling = false;
+        _hookedEnemy = false;
+        _playerController.isGrappling = false;
+        if(!_playerController.isGrounded && _playerController.playerRigidbody.velocity.y < -_playerController.playerMovement.maxFallSpeed)
+        {
+            _playerController.inFreeFlight = true;
+        }
         lr.positionCount = 0;
         Invoke("ActivateGravity", zeroGravityTime);
-        if(_needsZeroGravity)_playerController.playerRigidbody.velocity = Vector3.zero;
+        if(_needsZeroGravity && !_hookedEnemy)_playerController.playerRigidbody.velocity = Vector3.zero;
     }
 
     void ActivateGravity()

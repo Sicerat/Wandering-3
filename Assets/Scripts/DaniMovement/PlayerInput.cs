@@ -51,7 +51,6 @@ public class PlayerInput : MonoBehaviour
         else if (Input.GetMouseButtonUp(1))
         {
             DoActionsRMBUp();
-            print("RMB released!");
         }
 
         if (Input.GetMouseButton(2))

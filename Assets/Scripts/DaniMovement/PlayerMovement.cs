@@ -30,10 +30,12 @@ public class PlayerMovement : MonoBehaviour {
     public float modifierOnScoped = 1f;
     public float multiplierInAir = 1f;
     public float multiplierInAirV = 1f;
+    public Transform groundCheckPosition;
     public bool grounded;
     public LayerMask whatIsGround;
     
     public float counterMovement = 0.175f;
+    public float counterFallMovement = 10f;
     private float threshold = 0.01f;
     public float maxSlopeAngle = 35f;
 
@@ -71,6 +73,7 @@ public class PlayerMovement : MonoBehaviour {
 
     
     private void FixedUpdate() {
+        CheckGround();
         Movement();
         LimitMovement();
     }
@@ -121,6 +124,7 @@ public class PlayerMovement : MonoBehaviour {
 
         //Counteract sliding and sloppy movement
         CounterMovement(x, y, mag);
+        CounterFallMovement();
         
         //If holding jump && ready to jump, then jump
         if (readyToJump && jumping) Jump();
@@ -165,27 +169,9 @@ public class PlayerMovement : MonoBehaviour {
         Vector3 horizontalVelocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
         Vector3 verticalVelocity = new Vector3(0, rb.velocity.y, 0);
 
-        
-        if (!_playerController.isGrappling)
+        if(rb.velocity.magnitude > maxAirSpeed)
         {
-            if (horizontalVelocity.magnitude > maxAirSpeed)
-            {
-                horizontalVelocity = horizontalVelocity.normalized * maxSpeed;
-            }
-
-            if (verticalVelocity.y < -maxFallSpeed)
-            {
-                verticalVelocity = verticalVelocity.normalized * maxFallSpeed;
-            }
-            else if (verticalVelocity.y > maxUpSpeed)
-            {
-                verticalVelocity = verticalVelocity.normalized * maxUpSpeed;
-            }
-            rb.velocity = new Vector3(horizontalVelocity.x, verticalVelocity.y, horizontalVelocity.z);
-        }
-        else
-        {
-            if (rb.velocity.magnitude > maxHookSpeed) rb.velocity = rb.velocity.normalized * maxHookSpeed;
+            rb.velocity = rb.velocity.normalized * maxAirSpeed;
         }
     }
 
@@ -260,6 +246,17 @@ public class PlayerMovement : MonoBehaviour {
         }
     }
 
+    private void CounterFallMovement()
+    {
+        if (grounded || _playerController.isGrappling || _playerController.inFreeFlight) return;
+
+        Debug.Log("Current fall speed: " + rb.velocity.y);
+        if(rb.velocity.y < -maxFallSpeed)
+        {
+            rb.AddForce(Vector3.up * counterFallMovement * Time.deltaTime);
+        }
+    }
+
     /// <summary>
     /// Find the velocity relative to where the player is looking
     /// Useful for vectors calculations regarding movement and limiting movement
@@ -288,31 +285,54 @@ public class PlayerMovement : MonoBehaviour {
     
     /// <summary>
     /// Handle ground detection
-    /// </summary>
-    private void OnCollisionStay(Collision other) {
+    //
+    //private void OnCollisionStay(Collision other) {
         //Make sure we are only checking for walkable layers
-        int layer = other.gameObject.layer;
-        if (whatIsGround != (whatIsGround | (1 << layer))) return;
+    //    int layer = other.gameObject.layer;
+    //    if (whatIsGround != (whatIsGround | (1 << layer))) return;
 
         //Iterate through every collision in a physics update
-        for (int i = 0; i < other.contactCount; i++) {
-            Vector3 normal = other.contacts[i].normal;
-            //FLOOR
-            if (IsFloor(normal)) {
-                grounded = true;
-                _playerController.isGrappling = false;
-                cancellingGrounded = false;
-                normalVector = normal;
-                CancelInvoke(nameof(StopGrounded));
-            }
-        }
+    //    for (int i = 0; i < other.contactCount; i++) {
+    //        Vector3 normal = other.contacts[i].normal;
+    //        //FLOOR
+    //        if (IsFloor(normal)) {
+    //            grounded = true;
+    //            cancellingGrounded = false;
+    //            normalVector = normal;
+    //            CancelInvoke(nameof(StopGrounded));
+    //        }
+    //    }
 
         //Invoke ground/wall cancel, since we can't check normals with CollisionExit
-        float delay = 3f;
-        if (!cancellingGrounded) {
-            cancellingGrounded = true;
-            Invoke(nameof(StopGrounded), Time.deltaTime * delay);
+    //    float delay = 3f;
+    //    if (!cancellingGrounded) {
+    //        cancellingGrounded = true;
+    //        Invoke(nameof(StopGrounded), Time.deltaTime * delay);
+    //    }
+    //}
+
+
+    private void CheckGround()
+    {
+        if (Physics.CheckSphere(groundCheckPosition.position, 0.1f, whatIsGround))
+        {
+            if (!grounded)
+            {
+                grounded = true;
+                _playerController.isGrounded = true;
+                if (_playerController.inFreeFlight) _playerController.inFreeFlight = false;
+            }
         }
+        else
+        {
+            if (grounded)
+            {
+                grounded = false;
+                _playerController.isGrounded = false;
+            }
+        }
+       
+
     }
 
     private void StopGrounded() {

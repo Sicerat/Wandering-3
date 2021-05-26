@@ -14,12 +14,15 @@ public class PlayerController : MonoBehaviour
     public bool resetVelocityOnHookStart = false;
     public bool isGrappling = false;
     public bool isGrounded = false;
+    public bool inFreeFlight = false;
     public Rigidbody playerRigidbody;
+    [HideInInspector] public PlayerMovement playerMovement;
 
     private void Awake()
     {
         PlayerHealth = maxHealth;
         playerRigidbody = GetComponentInChildren<Rigidbody>();
+        playerMovement = GetComponentInChildren<PlayerMovement>();
     }
 
     public float PlayerHealth

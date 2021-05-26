@@ -35,7 +35,6 @@ public class RagdollEnemy : MonoBehaviour
     {
         if ((whatCanHitMe.value & (1 << collision.gameObject.layer)) != 0)
         {
-            print("I collided with the player with velocity of " + collision.gameObject.GetComponent<Rigidbody>().velocity.magnitude);
             if(collision.gameObject.GetComponent<Rigidbody>().velocity.magnitude >= killVelocity)
             {
                 Die();
