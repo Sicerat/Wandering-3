@@ -888,6 +888,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2116531580, guid: 2aaf179349283504fae282d410b76c3a, type: 3}
+      propertyPath: impactEffect
+      value: 
+      objectReference: {fileID: 2115860339}
     - target: {fileID: 1427564356498208235, guid: 2aaf179349283504fae282d410b76c3a, type: 3}
       propertyPath: m_Name
       value: Enemy (10)
@@ -1105,6 +1109,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2116531580, guid: 2aaf179349283504fae282d410b76c3a, type: 3}
+      propertyPath: impactEffect
+      value: 
+      objectReference: {fileID: 2115860339}
     - target: {fileID: 1427564356498208235, guid: 2aaf179349283504fae282d410b76c3a, type: 3}
       propertyPath: m_Name
       value: Enemy (5)
@@ -1432,6 +1440,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2116531580, guid: 2aaf179349283504fae282d410b76c3a, type: 3}
+      propertyPath: impactEffect
+      value: 
+      objectReference: {fileID: 2115860339}
     - target: {fileID: 1427564356498208235, guid: 2aaf179349283504fae282d410b76c3a, type: 3}
       propertyPath: m_Name
       value: Enemy (9)
@@ -2571,6 +2583,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2116531580, guid: 2aaf179349283504fae282d410b76c3a, type: 3}
+      propertyPath: impactEffect
+      value: 
+      objectReference: {fileID: 2115860339}
     - target: {fileID: 1427564356498208235, guid: 2aaf179349283504fae282d410b76c3a, type: 3}
       propertyPath: m_Name
       value: Enemy (1)
@@ -2950,6 +2966,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2116531580, guid: 2aaf179349283504fae282d410b76c3a, type: 3}
+      propertyPath: impactEffect
+      value: 
+      objectReference: {fileID: 2115860339}
     - target: {fileID: 1427564356498208235, guid: 2aaf179349283504fae282d410b76c3a, type: 3}
       propertyPath: m_Name
       value: Enemy (11)
@@ -4258,7 +4278,10 @@ MonoBehaviour:
   hookGrappling: 1
   resetVelocityOnHookStart: 1
   isGrappling: 0
+  isGrounded: 0
+  inFreeFlight: 0
   playerRigidbody: {fileID: 0}
+  playerMovement: {fileID: 0}
 --- !u!114 &693312234
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4444,6 +4467,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2116531580, guid: 2aaf179349283504fae282d410b76c3a, type: 3}
+      propertyPath: impactEffect
+      value: 
+      objectReference: {fileID: 2115860339}
     - target: {fileID: 1427564356498208235, guid: 2aaf179349283504fae282d410b76c3a, type: 3}
       propertyPath: m_Name
       value: Enemy (4)
@@ -5831,6 +5858,7 @@ MonoBehaviour:
   modifierOnScoped: 1
   multiplierInAir: 1
   multiplierInAirV: 1
+  groundCheckPosition: {fileID: 0}
   grounded: 0
   whatIsGround:
     serializedVersion: 2
@@ -6323,6 +6351,36 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!1 &973354313
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 973354314}
+  m_Layer: 7
+  m_Name: GroundCheck
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &973354314
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 973354313}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -1.0001, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1243954240}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1019809485
 GameObject:
   m_ObjectHideFlags: 0
@@ -6411,6 +6469,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2116531580, guid: 2aaf179349283504fae282d410b76c3a, type: 3}
+      propertyPath: impactEffect
+      value: 
+      objectReference: {fileID: 2115860339}
     - target: {fileID: 1427564356498208235, guid: 2aaf179349283504fae282d410b76c3a, type: 3}
       propertyPath: m_Name
       value: Enemy (6)
@@ -8311,6 +8373,7 @@ MonoBehaviour:
   modifierOnScoped: 1
   multiplierInAir: 1
   multiplierInAirV: 1
+  groundCheckPosition: {fileID: 973354314}
   grounded: 0
   whatIsGround:
     serializedVersion: 2
@@ -8413,6 +8476,7 @@ Transform:
   m_Children:
   - {fileID: 2109076716}
   - {fileID: 1927385836}
+  - {fileID: 973354314}
   m_Father: {fileID: 693312238}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -8631,6 +8695,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2116531580, guid: 2aaf179349283504fae282d410b76c3a, type: 3}
+      propertyPath: impactEffect
+      value: 
+      objectReference: {fileID: 2115860339}
     - target: {fileID: 1427564356498208235, guid: 2aaf179349283504fae282d410b76c3a, type: 3}
       propertyPath: m_Name
       value: Enemy (12)
@@ -10654,6 +10722,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2116531580, guid: 2aaf179349283504fae282d410b76c3a, type: 3}
+      propertyPath: impactEffect
+      value: 
+      objectReference: {fileID: 2115860339}
     - target: {fileID: 1427564356498208235, guid: 2aaf179349283504fae282d410b76c3a, type: 3}
       propertyPath: m_Name
       value: Enemy (7)
@@ -12167,6 +12239,10 @@ PrefabInstance:
       propertyPath: waypoints.Array.data[1]
       value: 
       objectReference: {fileID: 1330958935}
+    - target: {fileID: 2116531580, guid: 2aaf179349283504fae282d410b76c3a, type: 3}
+      propertyPath: impactEffect
+      value: 
+      objectReference: {fileID: 2115860339}
     - target: {fileID: 1427564356498208235, guid: 2aaf179349283504fae282d410b76c3a, type: 3}
       propertyPath: m_Name
       value: Enemy (3)
@@ -15190,6 +15266,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2116531580, guid: 2aaf179349283504fae282d410b76c3a, type: 3}
+      propertyPath: impactEffect
+      value: 
+      objectReference: {fileID: 2115860339}
     - target: {fileID: 1427564356498208235, guid: 2aaf179349283504fae282d410b76c3a, type: 3}
       propertyPath: m_Name
       value: Enemy (2)
@@ -15654,6 +15734,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2116531580, guid: 2aaf179349283504fae282d410b76c3a, type: 3}
+      propertyPath: impactEffect
+      value: 
+      objectReference: {fileID: 2115860339}
     - target: {fileID: 1427564356498208235, guid: 2aaf179349283504fae282d410b76c3a, type: 3}
       propertyPath: m_Name
       value: Enemy (8)

@@ -21,6 +21,7 @@ public class GrapplingGun : altFireBase {
     public float simplifiedGrapplePullForce = 100f;
     public float simplifiedGrappleSlapForce = 100f;
     private bool _isGrappling = false;
+    private bool _isSlapping = false;
 
     Vector3 shootDirection;
 
@@ -54,7 +55,8 @@ public class GrapplingGun : altFireBase {
         {
             if (distanceToGrapplePoint > 1f)
             {
-                if (_playerController.playerRigidbody.velocity.magnitude < maxHookSpeed)
+                if (grappleAnchor != null) grapplePoint = grappleAnchor.transform.position;
+                if (_playerController.playerRigidbody.velocity.magnitude < maxHookSpeed || true)
                 {
                     //_playerController.playerRigidbody.velocity = (grapplePoint - camera.position).normalized * hookSpeed;
                     _playerController.playerRigidbody.AddForce((grapplePoint - camera.position).normalized * hookSpeed * 1000f * Time.fixedDeltaTime);
@@ -229,6 +231,8 @@ public class GrapplingGun : altFireBase {
 
     void DoHookGrapple()
     {
+        if (_isGrappling) return;
+
         RaycastHit hit;
         if (Physics.SphereCast(camera.position, sphereCastRadius, camera.forward, out hit, maxDistance, whatIsGrappleable))
         {
@@ -239,6 +243,8 @@ public class GrapplingGun : altFireBase {
             if (hit.transform.gameObject.GetComponent<Grappable>() != null)
             {
                 hit.transform.gameObject.GetComponent<Rigidbody>().AddForce((hit.point - transform.position).normalized * simplifiedGrappleSlapForce);
+                _isSlapping = true;
+                Invoke("StopHookSlapping", 0.2f);
             }
             else
             {
@@ -246,6 +252,9 @@ public class GrapplingGun : altFireBase {
                 {
                     _playerController.playerRigidbody.AddForce(Vector3.up * 500f);
                     _hookedEnemy = true;
+                    grappleAnchor = new GameObject();
+                    grappleAnchor.transform.position = hit.point;
+                    grappleAnchor.transform.SetParent(hit.transform);
                 }
                 distanceToGrapplePoint = (hit.point - camera.position).magnitude;
                 if (_playerController.resetVelocityOnHookStart) _playerController.playerRigidbody.velocity = Vector3.zero;
@@ -256,12 +265,12 @@ public class GrapplingGun : altFireBase {
         }
     }
 
-
     void StopHookGrapple()
     {
         _isGrappling = false;
         _hookedEnemy = false;
         _playerController.isGrappling = false;
+        if (grappleAnchor != null) Destroy(grappleAnchor);
         if(!_playerController.isGrounded && _playerController.playerRigidbody.velocity.y < -_playerController.playerMovement.maxFallSpeed)
         {
             _playerController.inFreeFlight = true;
@@ -269,6 +278,12 @@ public class GrapplingGun : altFireBase {
         lr.positionCount = 0;
         Invoke("ActivateGravity", zeroGravityTime);
         if(_needsZeroGravity && !_hookedEnemy)_playerController.playerRigidbody.velocity = Vector3.zero;
+    }
+
+    void StopHookSlapping()
+    {
+        _isSlapping = false;
+        lr.positionCount = 0;
     }
 
     void ActivateGravity()
@@ -306,7 +321,7 @@ public class GrapplingGun : altFireBase {
     
     void DrawRope() {
         //If not grappling, don't draw rope
-        if (!joint && !_isGrappling) return;
+        if (!joint && !_isGrappling && !_isSlapping) return;
 
         if (grappleAnchor != null)
         {
