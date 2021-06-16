@@ -115,6 +115,7 @@ public class PlayerMovement : MonoBehaviour {
     }
 
     private void Movement() {
+        if (_playerController.isGrappling) return;
         //Extra gravity
         rb.AddForce(Vector3.down * Time.deltaTime * 10);
         
